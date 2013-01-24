@@ -12,11 +12,11 @@ search_str=`echo $1 | sed -e "s/\"//" | sed -e "s/\ /+/g"`
 
 cd $2
 
-wget http://www.greeksubtitles.info/search.php?name=$search_str -O search.html > /dev/null 2>&1
+wget http://www.greeksubtitles.info/search.php?name=$search_str -O search.html
 
 echo [+] Downloading 
 for i in `grep -o get_greek.* search.html | cut -d "'" -f1 | cut -d "?" -f2`; do
-  wget http://www.findsubtitles.eu/getp.php?$i -P $2 > /dev/null 2>&1
+  wget http://www.findsubtitles.eu/getp.php?$i -P $2 -O $i 
 done
 
 echo [+] Extracting 

@@ -1,13 +1,29 @@
-#!/bin/bash -
+#!/bin/bash
+EP_REGEX='.*[sS]*[0-9]+[xeE][0-9]+.*'
+VID="$EP_REGEX"'.(avi|mkv)'
+SUB="$EP_REGEX"'.(srt|idx|sub)'
 
-<<COMMENT
-for f in *.mkv; do
-      CURRENT_VID = `echo $f | sed -e 's/.srt//' `
-      ID = `echo $CURRENT_VID | grep -o [Ss][[:digit:]].[Ee][[:digit:]].`
-      SUB = `ls *.srt | grep $ID`
-      echo $CURRENT_VID
-      echo $ID
-      echo $SUB
-      cp $SUB $CURRENT_VID.srt
+for i in $(find . -maxdepth 1 -regextype posix-egrep -iregex "$VID"); do
+  # find corresponding srt
+  ep=$(echo $i | grep -E -i -o "$EP_REGEX")
+  sub=$(find . -maxdepth 1 -regextype posix-egrep -iregex "$SUB")
+
+  if [ $1 == "debug" ]
+    then
+      echo video file: $i
+      echo ep code is: $ep
+      echo new name of sub: $sub
+      exit
+  fi
+
+  if [ -n sub ]
+    then
+    
+    IFS=$','
+    # rename it!
+    mv $sub $(basename "$i" .avi).srt
+    unset IFS
+  
+  fi
+
 done
-COMMENT
