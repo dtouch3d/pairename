@@ -1,18 +1,19 @@
 #!/bin/bash
-EP_REGEX='.*[sS]*[0-9]+[xeE][0-9]+.*'
+EP_CODE='[sS]*[0-9]+[xeE][0-9]+'
+EP_REGEX=".*$EP_CODE.*"
 VID="$EP_REGEX"'.(avi|mkv)'
-SUB="$EP_REGEX"'.(srt|idx|sub)'
+SUB=".*$EP_REGEX.*"'.(srt|idx|sub)'
 
 for i in $(find . -maxdepth 1 -regextype posix-egrep -iregex "$VID"); do
   # find corresponding srt
-  ep=$(echo $i | grep -E -i -o "$EP_REGEX")
-  sub=$(find . -maxdepth 1 -regextype posix-egrep -iregex "$SUB")
+  ep=$(echo $i | grep -E -i -o "$EP_CODE")
+  sub=$(find . -maxdepth 0 -regextype posix-egrep -iregex "$SUB")
 
   if [ $1 == "debug" ]
     then
       echo video file: $i
       echo ep code is: $ep
-      echo new name of sub: $sub
+      echo sub found: $sub
       exit
   fi
 
@@ -21,7 +22,7 @@ for i in $(find . -maxdepth 1 -regextype posix-egrep -iregex "$VID"); do
     
     IFS=$','
     # rename it!
-    mv $sub $(basename "$i" .avi).srt
+    mv $sub $(basename "$i" .$(echo $i | grep -o "(avi|mkv)")).srt
     unset IFS
   
   fi
