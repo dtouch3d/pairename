@@ -1,1 +1,0 @@
-A collection of scripts to automate various tasks for tv series subtitles, namely mass downloading and auto renamer.
