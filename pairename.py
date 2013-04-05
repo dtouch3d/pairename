@@ -4,35 +4,56 @@ import os
 import sys
 import argparse
 
-
-parser = argparse.ArgumentParser(description=
-         'Renames files of one extension to match name of the other'
-         'Target folder must hold only two kinds of files.')
-
-parser.add_argument('-m', action="store", dest="matchingExt", help=
-                    'The extension of the filenames you want to rename to')
-parser.add_argument('-r', action="store", dest="toRenameExt", help=
-                    'The extension of the files you want to rename')
-
-print(parser.parse_args())
-
-# parser.add_argument('--debug', action='store_true', help='dry run, print debug messages')
-
-
-# TODO: argparser, verbose ?
-#       Eliminate matchingExt,2 altogether ?
+# TODO: 
 #       Backup / revert changes ?
 #       Auto find extensions
 
-if len(sys.argv) != 4:
-    print("subrename.py <target folder> <toRenameExt> <matchingExt>\n"
-          "Renames files with matchingExt with the name of the respective "
-          "alphabetical order of toRenameExt")
-    sys.exit(0)
 
-path = sys.argv[1]
-matchingExt = sys.argv[2]   # matching extension
-toRenameExt = sys.argv[3]   # rename files with this extension
+parser = argparse.ArgumentParser(
+        description='Renames files of one extension to match the file names of the other')
+
+parser.add_argument('-m', action="store", dest="matchingExt", help=
+                    'extension of the filenames you want to rename to')
+parser.add_argument('-r', action="store", dest="toRenameExt", help=
+                    'extension of the files you want to rename')
+parser.add_argument('-d', action="store", dest='path', help=
+                    'target directory containing the files you want to rename')
+parser.add_argument('--dry', action="store_true", dest='dry', help=
+                    'renames nothing, prints debug messages')
+parser.add_argument('--verbose', action="store_true", dest='verbose', help=
+                    'prints debug messages')
+parser.add_argument('--version', action="version", version='%(prog)s 0.6')
+
+cmd_args = parser.parse_args()
+
+def dbg(*args):
+    if cmd_args.dry or cmd_args.verbose:
+        for arg in args:
+            sys.stdout.write(str(arg))
+        print()
+
+# TODO: 
+#       Backup / revert changes ?
+#       Auto find extensions
+
+matchingExt = cmd_args.matchingExt
+toRenameExt = cmd_args.toRenameExt
+path = cmd_args.path
+
+if matchingExt is None or toRenameExt is None:
+    print('Not enough arguments!')
+    sys.exit(1)
+
+pwd = os.path.realpath(path)
+os.chdir(pwd)
+
+ls = os.listdir(pwd)
+
+cmd_args = parser.parse_args()
+
+matchingExt = cmd_args.matchingExt
+toRenameExt = cmd_args.toRenameExt
+path = cmd_args.path
 
 pwd = os.path.realpath(path)
 os.chdir(pwd)
@@ -45,14 +66,15 @@ matchingExtList.sort()
 toRenameExtList = [x for x in ls if toRenameExt in x]
 toRenameExtList.sort()
 
-print("matchingExtList: ", str(matchingExtList))
-print("toRenameExtList: ", str(toRenameExtList))
-
 toRenameExtListNew = [os.path.splitext(x)[0] + "." + toRenameExt
                      for x in matchingExtList]
 
-print("toRenameExtListNew:", toRenameExtListNew)
+dbg(path)
+dbg("matchingExtList: ", str(matchingExtList))
+dbg("toRenameExtList: ", str(toRenameExtList))
+dbg("toRenameExtListNew:", toRenameExtListNew)
 
 for toRenameExt, toRenameExtNew in zip(toRenameExtList, toRenameExtListNew):
-    print("Renaming " + toRenameExt + " to " + toRenameExtNew)
-    os.rename(toRenameExt, toRenameExtNew)
+    dbg("Renaming " + toRenameExt + " to " + toRenameExtNew)
+    if not cmd_args.dry:
+        os.rename(toRenameExt, toRenameExtNew)
