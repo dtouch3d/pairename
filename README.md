@@ -11,6 +11,6 @@ optional arguments:
   -r TORENAMEEXT  extension of the files you want to rename
   -d PATH         target directory containing the files you want to rename
   --dry           renames nothing, prints debug messages
-  -verbose        verbose, prints debug messages
+  --verbose        verbose, prints debug messages
   --version       show program's version number and exiHPE 87
 ```
