@@ -13,6 +13,7 @@ cmd_args = None
 
 def dbg(*args):
     if cmd_args.verbose or cmd_args.dry:
+        sys.stdout.write('[DEBUG]: ')
         for arg in args:
             sys.stdout.write(str(arg))
         print()
@@ -33,7 +34,7 @@ def get_args():
                         'you want to rename', default=os.getcwd())
     parser.add_argument('--dry', action="store_true", dest='dry', help=
                         'renames nothing, prints debug messages')
-    parser.add_argument('-verbose', action="store_true", dest='verbose', help=
+    parser.add_argument('--verbose', action="store_true", dest='verbose', help=
                         'verbose, prints debug messages')
     parser.add_argument('--version', action="version", version='%(prog)s 0.6')
 
@@ -67,9 +68,9 @@ def main():
                          for x in matchingExtList]
 
     dbg('Current path:', path)
-    #dbg("matchingExtList: ", str(matchingExtList))
-    #dbg("toRenameExtList: ", str(toRenameExtList))
-    #dbg("toRenameExtListNew:", toRenameExtListNew)
+    dbg("Files to rename: ", str(toRenameExtList))
+    dbg("Matching: ", str(matchingExtList))
+    dbg("New file names: ", toRenameExtListNew)
 
     for toRenameExt, toRenameExtNew in zip(toRenameExtList,
                                            toRenameExtListNew):
