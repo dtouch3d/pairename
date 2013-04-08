@@ -4,10 +4,6 @@ import os
 import sys
 import argparse
 
-# TODO:
-#       Backup / revert changes ?
-#       Auto find extensions
-
 cmd_args = None
 
 
@@ -24,7 +20,6 @@ def get_args():
     parser = argparse.ArgumentParser(
             description='Renames files of one extension to '
                         'match the file names of the other')
-
     parser.add_argument('-m', action="store", dest="matchingExt", help=
                         'extension of the filenames you want to rename to')
     parser.add_argument('-r', action="store", dest="toRenameExt", help=
@@ -58,11 +53,8 @@ def main():
 
     ls = os.listdir(pwd)
 
-    matchingExtList = [x for x in ls if matchingExt in x]
-    matchingExtList.sort()
-
-    toRenameExtList = [x for x in ls if toRenameExt in x]
-    toRenameExtList.sort()
+    matchingExtList = [x for x in ls if matchingExt in x].sort()
+    toRenameExtList = [x for x in ls if toRenameExt in x].sort()
 
     toRenameExtListNew = [os.path.splitext(x)[0] + "." + toRenameExt
                          for x in matchingExtList]
