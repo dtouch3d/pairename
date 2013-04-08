@@ -31,6 +31,8 @@ def get_args():
                         'renames nothing, prints debug messages')
     parser.add_argument('--verbose', action="store_true", dest='verbose', help=
                         'verbose, prints debug messages')
+    parser.add_argument('--revert', action="store_true", dest='revert', help=
+                        'restores previously changed file names')
     parser.add_argument('--version', action="version", version='%(prog)s 0.6')
 
     return parser.parse_args()
@@ -44,7 +46,7 @@ def main():
     toRenameExt = cmd_args.toRenameExt
     path = cmd_args.path
 
-    if matchingExt is None or toRenameExt is None:
+    if (matchingExt is None or toRenameExt is None) and not cmd_args.revert:
         print('Not enough arguments! (-h for help)')
         sys.exit(1)
 
@@ -53,22 +55,39 @@ def main():
 
     ls = os.listdir(pwd)
 
-    matchingExtList = [x for x in ls if matchingExt in x].sort()
-    toRenameExtList = [x for x in ls if toRenameExt in x].sort()
+    matchingExtList = []
+    toRenameExtList = []
+    toRenameExtListNew = []
 
-    toRenameExtListNew = [os.path.splitext(x)[0] + "." + toRenameExt
-                         for x in matchingExtList]
+    # Backup file in the same folder
+    with open('.pairename.bak', 'r') as backup:
+        dbg(backup)
+        if cmd_args.revert:
+            for line in backup.readlines():
+                dbg(line)
+                l = line.strip().split(':')  # HERE'S THE CULPRIT
+                toRenameExtList.append(l[0])
+                toRenameExtListNew.append(l[1])
+        else:
+            matchingExtList = sorted([x for x in ls if matchingExt in x])
+            toRenameExtList = sorted([x for x in ls if toRenameExt in x])
+
+            toRenameExtListNew = [os.path.splitext(x)[0] + "." + toRenameExt
+                                 for x in matchingExtList]
 
     dbg('Current path:', path)
     dbg("Files to rename: ", str(toRenameExtList))
     dbg("Matching: ", str(matchingExtList))
     dbg("New file names: ", toRenameExtListNew)
 
-    for toRenameExt, toRenameExtNew in zip(toRenameExtList,
-                                           toRenameExtListNew):
-        dbg(toRenameExt, " --> ", toRenameExtNew)
-        if not cmd_args.dry:
-            os.rename(toRenameExt, toRenameExtNew)
-
+               
+                
+    with open('.pairename.bak', 'w') as backup:
+        for toRenameExt, toRenameExtNew in zip(toRenameExtList,
+                                               toRenameExtListNew):
+            dbg(toRenameExt, " --> ", toRenameExtNew)
+            if not cmd_args.dry:
+                backup.write(toRenameExtNew + ':' + toRenameExt + '\n')
+                os.rename(toRenameExt, toRenameExtNew)
 if __name__ == '__main__':
     main()
