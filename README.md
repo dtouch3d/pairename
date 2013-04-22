@@ -2,6 +2,9 @@ pairename
 ==========
 
 Renames pairs of files with different extension to the same name. Useful for subtitles and maybe more.
+
+Currently it matches pairs of files based on the alphabetical order of the two kinds of files. Fuzzy string matching is on the way.
+
 ```
 usage: pairename.py [-h] [-m MATCHINGEXT] [-r TORENAMEEXT] [-d PATH] [--dry]
                     [-verbose] [--version]
